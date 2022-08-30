@@ -4,14 +4,13 @@ import Logo from '../assets/Images/Logo3.png'
 import LogoText from '../assets/Images/Text5.png';
 import LogOutIcon from 'react-native-vector-icons/Feather';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { authentication } from "../Firebase/firebase";
+import { signOut } from "firebase/auth";
 import MyStausBar from '../Components/MyStatusBar'
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 
 const Suggestion = ({ navigation }) => {
-
-    // const { default: axios } = require("axios");
-    // const FormData = require("form-data")
 
     const Situation = [
         { text: '曖昧對象約會', pass: '約會', key: '1', background: require('../assets/Images/Dating.jpg'), description: '適合與心儀對象一同外出，展現美麗自信的你' },
@@ -38,6 +37,16 @@ const Suggestion = ({ navigation }) => {
             </View>
         </View>
     );
+
+    const LogOut = () => {
+        signOut(authentication)
+            .then(() => {
+                route.params.authenticate(false);
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+    }
 
     const [fontsLoaded] = useFonts({
         'Content': require('../assets/Fonts/台灣圓體-Regular.ttf'),
@@ -72,7 +81,9 @@ const Suggestion = ({ navigation }) => {
                     <Image source={LogoText} style={styles.TopLogo2} />
                 </View>
                 <View style={styles.LogOut}>
-                    <LogOutIcon name="log-out" size={35} color='#fff' />
+                    <TouchableOpacity onPress={LogOut}>
+                        <LogOutIcon name="log-out" size={35} color='#fff' />
+                    </TouchableOpacity>
                 </View>
             </View>
             <View style={styles.BottomView}>

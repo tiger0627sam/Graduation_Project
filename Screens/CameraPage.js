@@ -59,46 +59,6 @@ const CameraPage = ({ navigation, route }) => {
     ToHome(DataBase64)
   }
 
-  const face_analysis = async () => {
-
-    try {
-      const DataBase64 = await FileSystem.readAsStringAsync(image, { encoding: FileSystem.EncodingType.Base64 });
-      // console.log('2515487159498189198')
-      // console.log(DataBase64)
-      const bodyFormData = new FormData();
-      //把資料放進form data
-      bodyFormData.append('data', DataBase64)
-
-      // await axios.post("https://get-face-analysis-image.herokuapp.com/get",
-      //     {
-      //         bodyFormData
-      //     }, {
-      //     headers: {
-      //         'Content-Type': 'application/json'
-      //     }
-      // }
-      // )
-      //     .then(res => { console.log(res.data) })
-      await fetch("https://graduate-project-api.herokuapp.com/face_analysis", {
-        method: "POST",
-        body: bodyFormData
-      })
-        .then(res => res.text())
-        .then(data => { console.log(data) })
-
-      //   await fetch("https://get-face-analysis-image.herokuapp.com/get", {
-      //     method: "POST",
-      //     body: bodyFormData
-      //   })
-      //     .then(res => res.text())
-      //     .then(data => { console.log(data) })
-    }
-
-    catch (err) {
-      console.log(err)
-    }
-
-  }
 
   if (hasCameraPermission === false) {
     return <Text>未取得相機權限，請再試一次</Text>;

@@ -30,7 +30,7 @@ const App: () => Node = () => {
 
 
   // const [test, isTested] = useState(false);
-  const [isSignedIn, setIsSignedIn] = useState(true);
+  const [isSignedIn, setIsSignedIn] = useState(false);
 
   const signIn = (signInStatus) => {
     setIsSignedIn(signInStatus);
@@ -51,7 +51,7 @@ const App: () => Node = () => {
   const AnalyseStackScreen = () => {
     return (
       <AnalyseStack.Navigator>
-        <AnalyseStack.Screen name="S_StartAnalyse" initialParams={{ authenticate: signIn }} component={N_StartAnalyse} options={{ headerShown: false }} />
+        <AnalyseStack.Screen name="S_StartAnalyse" component={N_StartAnalyse} options={{ headerShown: false }} />
         <AnalyseStack.Screen name="S_Camera" component={N_Camera} options={{ headerShown: false }} />
         <AnalyseStack.Screen name="S_Home" component={N_Home} options={{ headerShown: false }} />
       </AnalyseStack.Navigator>
@@ -62,7 +62,7 @@ const App: () => Node = () => {
   const SuggestionSetStackScreen = () => {
     return (
       <SuggestionSetStack.Navigator>
-        <SuggestionSetStack.Screen name="S_Suggestion" component={N_Suggestion} options={{ headerShown: false }} />
+        <SuggestionSetStack.Screen name="S_Suggestion" initialParams={{ authenticate: signIn }} component={N_Suggestion} options={{ headerShown: false }} />
         <SuggestionSetStack.Screen name="S_SituationPackage" component={N_SituationPackage} options={{ headerShown: false }} />
       </SuggestionSetStack.Navigator>
     )//第二個Bottom Tab的堆疊

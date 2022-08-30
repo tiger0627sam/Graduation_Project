@@ -21,10 +21,11 @@ const Home = ({ navigation, route }) => {
     }
 
     const [visible, setVisible] = useState(false);
-    // const [test_result, setTest_result] = useState();
     const [isLoading, setIsLoading] = useState(true);
     const [dataAnalyzed, setDataAnalyzed] = useState({});
     const [faceAnalyzed, setFaceAnalyzed] = useState('');
+    const [RawFace, setRawFace] = useState('');
+
 
     const [fontsLoaded] = useFonts({
         'Content': require('../assets/Fonts/台灣圓體-Regular.ttf'),
@@ -68,12 +69,14 @@ const Home = ({ navigation, route }) => {
 
     useEffect(() => {
         const test_result = route.params
+        console.log(test_result)
+        setRawFace('data:image/png;base64,' + route.params)
         const bodyFormData = new FormData();
         //把資料放進form data
         bodyFormData.append('data', test_result)
         const face_analysis = async () => {
             try {
-                // console.log(test_result)
+                console.log(1112255556)
                 await fetch("https://graduate-project-api.herokuapp.com/get-faceRecommend", {
                     // https://graduate-project-api.herokuapp.com/face_analysis
                     method: "POST",
@@ -102,6 +105,7 @@ const Home = ({ navigation, route }) => {
 
             catch (err) {
                 console.log(err)
+                setIsLoading(false)
             }
         }
         face_analysis()

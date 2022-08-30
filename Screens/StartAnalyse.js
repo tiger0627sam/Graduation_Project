@@ -4,8 +4,9 @@ import * as ImagePicker from 'expo-image-picker';
 import Logo from '../assets/Images/Logo3.png';
 import LogoText from '../assets/Images/Text5.png';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { authentication } from "../Firebase/firebase";
+import { signOut } from "firebase/auth";
 import * as FileSystem from 'expo-file-system';
-import axios from 'axios';
 import LogOutIcon from 'react-native-vector-icons/Feather';
 import MyStausBar from '../Components/MyStatusBar'
 import { useFonts } from 'expo-font';
@@ -23,6 +24,16 @@ const StartAnalyse = ({ navigation, route }) => {
 
     const [selectedImage, setSelectedImage] = useState(null);
     const [test, isTested] = useState(false);
+
+    const LogOut = () => {
+        signOut(authentication)
+            .then(() => {
+                route.params.authenticate(false);
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+    }
 
     const [fontsLoaded] = useFonts({
         'Content': require('../assets/Fonts/台灣圓體-Regular.ttf'),
@@ -65,7 +76,6 @@ const StartAnalyse = ({ navigation, route }) => {
         setSelectedImage({ localUri: pickerResult.uri });
     }//選照片的function
 
-    // const { default: axios } = require("axios");
     const FormData = require("form-data")
 
     //讀取圖片成base64 string
@@ -104,6 +114,7 @@ const StartAnalyse = ({ navigation, route }) => {
     const pass_data = async () => {
         const DataBase64 = await FileSystem.readAsStringAsync(selectedImage.localUri, { encoding: FileSystem.EncodingType.Base64 });
         ToHome(DataBase64)
+        // console.log(DataBase64)
     }
 
     if (selectedImage !== null) {
@@ -157,6 +168,12 @@ const StartAnalyse = ({ navigation, route }) => {
                             <Icon name="history" size={26} color='#000' />
                             <Text style={styles.ButtonText}>
                                 歷史紀錄
+                            </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.LogOutButton} onPress={LogOut}>
+                            <LogOutIcon name="log-out" size={16} color='gray' />
+                            <Text style={styles.LogOutText}>
+                                登出
                             </Text>
                         </TouchableOpacity>
                     </View>
@@ -240,6 +257,18 @@ const styles = StyleSheet.create({
         fontFamily: 'Content',
         fontSize: 24,
         marginLeft: 15,
+    },
+    LogOutButton: {
+        width: '20%',
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    LogOutText: {
+        color: 'gray',
+        fontFamily: 'Content',
+        marginLeft: 5,
     },
     ButtonIcon: {
         justifyContent: 'center',
