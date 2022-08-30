@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 // import type { Node } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { authentication } from "./Firebase/firebase";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import N_SignIn from './Screens/Signin'
 import N_SignUp from './Screens/Signup'
 import N_Welcome from './Screens/WelcomePage'
@@ -35,38 +36,26 @@ const App: () => Node = () => {
     setIsSignedIn(signInStatus);
   }
 
-  // useEffect(()=>{
-  //   onAuthStateChanged(auth, (user) => {
-  //     if(user){
-  //       setIsSignedIn(true);
-  //     }else{
-  //       setIsSignedIn(false)
-  //     }
-  //   })
-  // })
+  useEffect(() => {
+    const auth = getAuth();
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setIsSignedIn(true);
+      } else {
+        setIsSignedIn(false)
+      }
+    })
+  }, [])
 
   const AnalyseStack = createNativeStackNavigator();
   const AnalyseStackScreen = () => {
-    // const [test, setIsTested] = useState(false);
-    // const Tested = (TestStatus) => {
-    //   setIsTested(TestStatus);
-    // }
-    // if (!test) {
     return (
       <AnalyseStack.Navigator>
-        <AnalyseStack.Screen name="S_StartAnalyse" component={N_StartAnalyse} options={{ headerShown: false }} />
+        <AnalyseStack.Screen name="S_StartAnalyse" initialParams={{ authenticate: signIn }} component={N_StartAnalyse} options={{ headerShown: false }} />
         <AnalyseStack.Screen name="S_Camera" component={N_Camera} options={{ headerShown: false }} />
         <AnalyseStack.Screen name="S_Home" component={N_Home} options={{ headerShown: false }} />
       </AnalyseStack.Navigator>
     )
-    // }
-    // else {
-    //   return (
-    //     <AnalyseStack.Navigator>
-    //       <AnalyseStack.Screen name="S_Home" component={N_Home} options={{ headerShown: false }} />
-    //     </AnalyseStack.Navigator>
-    //   )
-    // }
   }//第一個Bottom Tab的堆疊
 
   const SuggestionSetStack = createNativeStackNavigator();
@@ -93,7 +82,6 @@ const App: () => Node = () => {
     return (
       <NavigationContainer>
         <SignedOut_Part.Navigator>
-          {/* <SignedOut_Part.Screen name="S_Test" component={N_Test} options={{ headerShown: false }} /> */}
           <SignedOut_Part.Screen name="S_Welcome" component={N_Welcome} options={{ headerShown: false }} />
           <SignedOut_Part.Screen name="S_SignIn" initialParams={{ authenticate: signIn }} component={N_SignIn} options={{ headerShown: false }} />
           <SignedOut_Part.Screen name="S_SignUp" component={N_SignUp} options={{ headerShown: false }} />
@@ -131,7 +119,6 @@ const App: () => Node = () => {
             showLabel: true,
             tabBarStyle: {
               backgroundColor: '#FAF2F2',
-              // height: 50,
             },
           })}
         >
