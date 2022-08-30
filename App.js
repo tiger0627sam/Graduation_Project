@@ -28,9 +28,8 @@ const App: () => Node = () => {
   const SignedOut_Part = createNativeStackNavigator();
   const SignedIn_Part = createBottomTabNavigator();
 
-
-  // const [test, isTested] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
+  // const [isPrepared, setIsPrepared] = useState(false);
 
   const signIn = (signInStatus) => {
     setIsSignedIn(signInStatus);
@@ -45,6 +44,7 @@ const App: () => Node = () => {
         setIsSignedIn(false)
       }
     })
+    // setIsPrepared(true)
   }, [])
 
   const AnalyseStack = createNativeStackNavigator();
