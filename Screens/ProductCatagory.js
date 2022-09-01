@@ -4,6 +4,8 @@ import Logo from '../assets/Images/Logo3.png'
 import LogoText from '../assets/Images/Text5.png';
 import LogOutIcon from 'react-native-vector-icons/Feather';
 import MyStausBar from '../Components/MyStatusBar'
+import { authentication } from "../Firebase/firebase";
+import { signOut } from "firebase/auth";
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 
@@ -42,6 +44,15 @@ const ProductCatagory = ({ navigation }) => {
         </TouchableOpacity>
     );
 
+    const LogOut = () => {
+        signOut(authentication)
+            .then(() => {
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+    }
+
     const [fontsLoaded] = useFonts({
         'Content': require('../assets/Fonts/台灣圓體-Regular.ttf'),
         'ArtFont': require('../assets/Fonts/JasonHandwriting2.ttf'),
@@ -72,7 +83,9 @@ const ProductCatagory = ({ navigation }) => {
                     <Image source={LogoText} style={styles.TopLogo2} />
                 </View>
                 <View style={styles.LogOut}>
-                    <LogOutIcon name="log-out" size={35} color='#fff' />
+                    <TouchableOpacity onPress={LogOut}>
+                        <LogOutIcon name="log-out" size={35} color='#fff' />
+                    </TouchableOpacity>
                 </View>
             </View>
             <ScrollView style={styles.BottomView}>

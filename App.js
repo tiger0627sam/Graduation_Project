@@ -3,9 +3,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React, { useState, useEffect } from 'react';
-// import type { Node } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { authentication } from "./Firebase/firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import N_SignIn from './Screens/Signin'
 import N_SignUp from './Screens/Signup'
@@ -18,18 +15,17 @@ import N_StartAnalyse from './Screens/StartAnalyse'
 import N_SituationPackage from './Screens/SituationPackage'
 import N_ProductCatagory from './Screens/ProductCatagory'
 import N_ProductDetail from './Screens/ProductDetail'
-import firebase from './Firebase/firebase'
 import TabIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-
-
 
 const App: () => Node = () => {
 
   const SignedOut_Part = createNativeStackNavigator();
   const SignedIn_Part = createBottomTabNavigator();
+  //宣告登入登出前後的Navigator
 
   const [isSignedIn, setIsSignedIn] = useState(false);
   // const [isPrepared, setIsPrepared] = useState(false);
+  // useState區
 
   const signIn = (signInStatus) => {
     setIsSignedIn(signInStatus);
@@ -46,6 +42,7 @@ const App: () => Node = () => {
     })
     // setIsPrepared(true)
   }, [])
+  // useEffect區
 
   const AnalyseStack = createNativeStackNavigator();
   const AnalyseStackScreen = () => {
@@ -62,7 +59,7 @@ const App: () => Node = () => {
   const SuggestionSetStackScreen = () => {
     return (
       <SuggestionSetStack.Navigator>
-        <SuggestionSetStack.Screen name="S_Suggestion" initialParams={{ authenticate: signIn }} component={N_Suggestion} options={{ headerShown: false }} />
+        <SuggestionSetStack.Screen name="S_Suggestion" component={N_Suggestion} options={{ headerShown: false }} />
         <SuggestionSetStack.Screen name="S_SituationPackage" component={N_SituationPackage} options={{ headerShown: false }} />
       </SuggestionSetStack.Navigator>
     )//第二個Bottom Tab的堆疊
@@ -104,7 +101,6 @@ const App: () => Node = () => {
                 iconName = focused
                   ? 'gift'
                   : 'gift-outline';
-                // iconName = focused ? 'archive' : 'archive-outline';
               }
               else if (route.name === '美妝單品') {
                 iconName = focused
@@ -131,12 +127,4 @@ const App: () => Node = () => {
   }
 }
 
-
 export default App;
-
-{/* <SignedOut_Part.Screen name="S_StartAnalyse" component={N_StartAnalyse} options={{ headerShown: false }} />
-          <SignedOut_Part.Screen name="S_Camera" component={N_Camera} options={{ headerShown: false }} />
-          <SignedOut_Part.Screen name="S_Home" component={N_Home} options={{ headerShown: false }} />
-          <SignedOut_Part.Screen name="S_Suggestion" component={N_Suggestion} options={{ headerShown: false }} />
-          <SignedOut_Part.Screen name="S_SitiuationPackage" component={N_SitiuationPackage} options={{ headerShown: false }} />
-          <SignedOut_Part.Screen name="S_ProductDetail" component={N_ProductDetail} options={{ headerShown: false }} />  */}

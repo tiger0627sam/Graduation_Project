@@ -1,24 +1,17 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { StyleSheet, Button, ScrollView, Text, View, Image, TextInput, Dimensions, TouchableOpacity, FlatList } from 'react-native';
-import Face from '../assets/Images/Results.jpeg'
+import { StyleSheet, Button, ScrollView, Text, View, Image, Dimensions, TouchableOpacity, FlatList } from 'react-native';
 import Logo from '../assets/Images/Logo3.png'
 import LogoText from '../assets/Images/Text5.png';
+import LogOutIcon from 'react-native-vector-icons/Feather';
 import { Overlay } from '@rneui/themed';
 import FormSuccess from '../Components/FormSuccess';
-import * as FileSystem from 'expo-file-system';
+import { authentication } from "../Firebase/firebase";
+import { signOut } from "firebase/auth";
 import MyStausBar from '../Components/MyStatusBar'
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 
 const Home = ({ navigation, route }) => {
-
-    function ToSignUp() {
-        navigation.navigate('S_SignUp')
-    }
-
-    function ToSignIn() {
-        navigation.navigate('S_SignIn')
-    }
 
     const [visible, setVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -26,6 +19,14 @@ const Home = ({ navigation, route }) => {
     const [faceAnalyzed, setFaceAnalyzed] = useState('');
     const [RawFace, setRawFace] = useState('');
 
+    const LogOut = () => {
+        signOut(authentication)
+            .then(() => {
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+    }
 
     const [fontsLoaded] = useFonts({
         'Content': require('../assets/Fonts/台灣圓體-Regular.ttf'),
@@ -69,14 +70,12 @@ const Home = ({ navigation, route }) => {
 
     useEffect(() => {
         const test_result = route.params
-        console.log(test_result)
         setRawFace('data:image/png;base64,' + route.params)
         const bodyFormData = new FormData();
         //把資料放進form data
         bodyFormData.append('data', test_result)
         const face_analysis = async () => {
             try {
-                console.log(1112255556)
                 await fetch("https://graduate-project-api.herokuapp.com/get-faceRecommend", {
                     // https://graduate-project-api.herokuapp.com/face_analysis
                     method: "POST",
@@ -119,12 +118,17 @@ const Home = ({ navigation, route }) => {
                 <Image source={Logo} style={styles.TopLogo} />
                 <Image source={LogoText} style={styles.TopLogo2} />
             </View>
+            <View style={styles.LogOut}>
+                <TouchableOpacity onPress={LogOut}>
+                    <LogOutIcon name="log-out" size={35} color='#fff' />
+                </TouchableOpacity>
+            </View>
             <ScrollView style={styles.ButtomView}>
                 <Text style={styles.Express}>
                     臉型分析
                 </Text>
                 <View style={styles.TopResult}>
-                    <Image source={{ uri: 'data:image/png;base64,' + route.params }} style={styles.TopPhoto} />
+                    <Image source={{ uri: RawFace }} style={styles.TopPhoto} />
                     <Image source={{ uri: faceAnalyzed }} style={styles.TopPhoto} />
                 </View>
                 {/* 上面放原本的照片跟分析完的點點 */}
@@ -268,6 +272,10 @@ const styles = StyleSheet.create({
         height: 45,
         width: 135,
         borderRadius: 2,
+    },
+    LogOut: {
+        marginTop: 25,
+        marginRight: 10,
     },
     Express: {
         textAlign: 'left',

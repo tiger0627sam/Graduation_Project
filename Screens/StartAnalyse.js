@@ -5,6 +5,7 @@ import Logo from '../assets/Images/Logo3.png';
 import LogoText from '../assets/Images/Text5.png';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { authentication } from "../Firebase/firebase";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { signOut } from "firebase/auth";
 import * as FileSystem from 'expo-file-system';
 import LogOutIcon from 'react-native-vector-icons/Feather';
@@ -24,16 +25,28 @@ const StartAnalyse = ({ navigation, route }) => {
 
     const [selectedImage, setSelectedImage] = useState(null);
     const [test, isTested] = useState(false);
+    const [userid, setUserid] = useState('');
 
     const LogOut = () => {
         signOut(authentication)
-            .then(() => {
-                route.params.authenticate(false);
+            .then((result) => {
             })
             .catch((err) => {
                 console.log(err)
             })
     }
+
+    useEffect(() => {
+        const auth = getAuth();
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                setUserid(user.uid);
+                console.log(userid)
+            }
+            else {
+            }
+        })
+    }, [])
 
     const [fontsLoaded] = useFonts({
         'Content': require('../assets/Fonts/台灣圓體-Regular.ttf'),
@@ -53,10 +66,7 @@ const StartAnalyse = ({ navigation, route }) => {
             await SplashScreen.hideAsync();
         }
     }, [fontsLoaded]);
-
-    if (!fontsLoaded) {
-        return null;
-    }//字體區
+    //字體區
 
     let openImagePickerAsync = async () => {
         setSelectedImage(null)
@@ -164,7 +174,7 @@ const StartAnalyse = ({ navigation, route }) => {
                                 選擇照片
                             </Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.SiguInButton}>
+                        <TouchableOpacity style={styles.SiguInButton} >
                             <Icon name="history" size={26} color='#000' />
                             <Text style={styles.ButtonText}>
                                 歷史紀錄

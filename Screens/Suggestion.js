@@ -41,7 +41,6 @@ const Suggestion = ({ navigation }) => {
     const LogOut = () => {
         signOut(authentication)
             .then(() => {
-                route.params.authenticate(false);
             })
             .catch((err) => {
                 console.log(err)

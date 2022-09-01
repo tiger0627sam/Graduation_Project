@@ -6,6 +6,8 @@ import Icon from 'react-native-vector-icons/Feather';
 import FormSuccess from '../Components/FormSuccess';
 import LogOutIcon from 'react-native-vector-icons/Feather';
 import MyStausBar from '../Components/MyStatusBar'
+import { authentication } from "../Firebase/firebase";
+import { signOut } from "firebase/auth";
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 
@@ -70,6 +72,16 @@ const SituationPackage = ({ navigation, route }) => {
     //不管中括號裡面放甚麼都一定會執行一次
     //中括號的參數只要改變就會再執行useEffect的東西
 
+    const LogOut = () => {
+        signOut(authentication)
+            .then(() => {
+                route.params.authenticate(false);
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+    }
+
     const [fontsLoaded] = useFonts({
         'Content': require('../assets/Fonts/台灣圓體-Regular.ttf'),
         'ArtFont': require('../assets/Fonts/JasonHandwriting2.ttf'),
@@ -100,7 +112,9 @@ const SituationPackage = ({ navigation, route }) => {
                     <Image source={LogoText} style={styles.TopLogo2} />
                 </View>
                 <View style={styles.LogOut}>
-                    <LogOutIcon name="log-out" size={35} color='#fff' />
+                    <TouchableOpacity onPress={LogOut}>
+                        <LogOutIcon name="log-out" size={35} color='#fff' />
+                    </TouchableOpacity>
                 </View>
             </View>
             <View style={styles.BottomView}>
