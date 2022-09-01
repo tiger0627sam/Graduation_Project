@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { StyleSheet, Button, ScrollView, TouchableWithoutFeedback, Text, View, Keyboard, Image, TextInput, TouchableOpacity } from 'react-native';
-import { authentication } from "../Firebase/firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { authentication, firestore_db } from "../Firebase/firebase";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc, getDoc, collection, addDoc, getDocs, updateDoc, increment, query, orderBy, limit } from "firebase/firestore";
 import FormError from '../Components/FormError';
 import FormSuccess from '../Components/FormSuccess';
 import Logo from '../assets/Images/Logo3.png';
@@ -46,18 +47,24 @@ const SignUp = () => {
     }//字體區
 
 
-    function RegisterUser() {
+    const RegisterUser = async () => {
         setIsLoading(true);
-        createUserWithEmailAndPassword(authentication, email, password)
-            .then(() => {
-                setIsLoading(false);
-                setSuccessMessage("Your account has been created");
-            })
-            .catch((err) => {
-                setIsLoading(false);
-                setErrorMessage(err.message);
-                setDisplayFormErr(true)
-            })
+        try {
+            const register = await createUserWithEmailAndPassword(authentication, email, password)
+            await setDoc(doc(firestore_db, "User", register.user.uid), {
+                email: register.user.email
+            });
+            await setDoc(doc(firestore_db, "Couter", register.user.uid), {
+                num: 1
+            });
+            setSuccessMessage("已註冊成功");
+            setIsLoading(false);
+        }
+        catch (err) {
+            setIsLoading(false);
+            setErrorMessage(err.message);
+            setDisplayFormErr(true)
+        }
     }
 
     const ValidataForm = () => {

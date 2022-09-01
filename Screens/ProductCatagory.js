@@ -73,6 +73,9 @@ const ProductCatagory = ({ navigation }) => {
         }
     }, [fontsLoaded]);
 
+    if (!fontsLoaded) {
+        return null;
+    }//字體區
 
     return (
         <View style={styles.mainView} onLayout={onLayoutRootView}>

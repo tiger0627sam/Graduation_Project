@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { StyleSheet, Button, ScrollView, Text, View, Image, Dimensions, TouchableOpacity, FlatList } from 'react-native';
+import { LogBox, StyleSheet, Button, ScrollView, Text, View, Image, Dimensions, TouchableOpacity, FlatList } from 'react-native';
 import Logo from '../assets/Images/Logo3.png'
 import LogoText from '../assets/Images/Text5.png';
 import LogOutIcon from 'react-native-vector-icons/Feather';
 import { Overlay } from '@rneui/themed';
 import FormSuccess from '../Components/FormSuccess';
+import Loading from '../Components/Loading';
 import { authentication, firestore_db } from "../Firebase/firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { doc, setDoc, getDoc, collection, addDoc, getDocs, updateDoc, increment } from "firebase/firestore";
@@ -17,11 +18,14 @@ const Home = ({ navigation, route }) => {
 
     const [visible, setVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [LoadingMsg, setLoadingMsg] = useState('');
     const [dataAnalyzed, setDataAnalyzed] = useState({});
     const [faceAnalyzed, setFaceAnalyzed] = useState('');
     const [RawFace, setRawFace] = useState('');
     const [userid, setUserid] = useState('');
-    const [couter, setCouter] = useState('1')
+    const [couter, setCouter] = useState(3)
+
+    LogBox.ignoreLogs(['Setting a timer']);
 
     const LogOut = () => {
         signOut(authentication)
@@ -31,17 +35,6 @@ const Home = ({ navigation, route }) => {
                 console.log(err)
             })
     }//登出
-
-    useEffect(() => {
-        const auth = getAuth();
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                setUserid(user.uid);
-            }
-            else {
-            }
-        })
-    }, [])
 
     const [fontsLoaded] = useFonts({
         'Content': require('../assets/Fonts/台灣圓體-Regular.ttf'),
@@ -84,6 +77,7 @@ const Home = ({ navigation, route }) => {
     const FormData = require("form-data")
 
     useEffect(() => {
+        setLoadingMsg('臉型分析中')
         const test_result = route.params
         setRawFace('data:image/png;base64,' + route.params)
         const bodyFormData = new FormData();
@@ -100,6 +94,7 @@ const Home = ({ navigation, route }) => {
                     .then(data => {
                         console.log(data)
                         setDataAnalyzed(data)
+                        setLoadingMsg('特徵分析中')
                     })
 
                 await fetch("https://get-face-analysis-image.herokuapp.com/get", {
@@ -125,8 +120,22 @@ const Home = ({ navigation, route }) => {
         face_analysis()
     }, [])//取得用戶提供的照片後進行分析並拿到分析結果
 
+    useEffect(() => {
+        const auth = getAuth();
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                setUserid(user.uid);
+                console.log(userid)
+            }
+            else {
+                console.log(5958859)
+            }
+        })
+    }, [isLoading])
+
     const upload_historydata = async () => {
         try {
+            setLoadingMsg('資料儲存中')
             setIsLoading(true)
             const docSnap = await getDoc(doc(firestore_db, "Couter", userid));
             if (docSnap.exists()) {
@@ -135,22 +144,16 @@ const Home = ({ navigation, route }) => {
             } else {
                 console.log("No such document!");
             }
-            // console.log(15484858858)
-            // await setDoc(doc(firestore_db, "UserRecord", "History", userid, '' + couter), {
-            //     ...dataAnalyzed,
-            //     pointedImage: faceAnalyzed,
-            //     rawfaceImage: RawFace,
-            //     key: couter,
-            // });
-            // console.log(8148484848485)
-            // await updateDoc(doc(firestore_db, "Couter", userid), {
-            //     num: increment(1)
-            // });
 
-            const querySnapshot = await getDocs(collection(firestore_db, "UserRecord", "History", userid));
-            querySnapshot.forEach((doc) => {
-                // doc.data() is never undefined for query doc snapshots
-                console.log(doc.id, " => ", doc.data());
+            await setDoc(doc(firestore_db, "UserRecord", "History", userid, couter + ''), {
+                ...dataAnalyzed,
+                pointedImage: faceAnalyzed,
+                rawfaceImage: RawFace,
+                key: couter,
+            });
+
+            await updateDoc(doc(firestore_db, "Couter", userid + ''), {
+                num: increment(1)
             });
         }
         catch (err) {
@@ -158,9 +161,7 @@ const Home = ({ navigation, route }) => {
         }
         setIsLoading(false)
     }
-    // await updateDoc(doc(firestore_db, "History", userid), {
-    //     num: increment(1)
-    // });
+
     return (
         <View style={styles.mainView} onLayout={onLayoutRootView}>
             <MyStausBar />
@@ -242,7 +243,7 @@ const Home = ({ navigation, route }) => {
                 </View>
             </ScrollView>
             {isLoading == true ?
-                <FormSuccess />
+                <Loading loadingMessage={LoadingMsg} />
                 :
                 null
             }
@@ -407,48 +408,3 @@ const styles = StyleSheet.create({
 })
 
 export default Home
-
-// const face_analysis = async () => {
-
-//     try {
-//         const DataBase64 = await FileSystem.readAsStringAsync(selectedImage.localUri, { encoding: FileSystem.EncodingType.Base64 });
-//         const bodyFormData = new FormData();
-//         //把資料放進form data
-//         bodyFormData.append('data', DataBase64)
-
-//         // await axios.post("https://get-face-analysis-image.herokuapp.com/get",
-//         //     {
-//         //         bodyFormData
-//         //     }, {
-//         //     headers: {
-//         //         'Content-Type': 'application/json'
-//         //         'Accept': "application/json",
-//         //     }
-//         // }
-//         // )
-//         //     .then(res => { console.log(res.data) })
-
-//         await fetch("https://graduate-project-api.herokuapp.com/get-faceRecommend", {
-//             // https://graduate-project-api.herokuapp.com/face_analysis
-//             method: "POST",
-//             body: bodyFormData
-//         })
-//             .then(res => res.json())
-//             .then(data => { console.log(data) })
-
-//         await fetch("https://get-face-analysis-image.herokuapp.com/get", {
-//             method: "POST",
-//             body: bodyFormData
-//         })
-//             .then(res => res.text())
-//             .then(data => {
-//                 console.log(data)
-//                 setSelectedImage({ localUri: data });
-//             })
-//     }
-
-//     catch (err) {
-//         console.log(err)
-//     }
-
-// }

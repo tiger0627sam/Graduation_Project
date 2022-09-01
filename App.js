@@ -15,6 +15,8 @@ import N_StartAnalyse from './Screens/StartAnalyse'
 import N_SituationPackage from './Screens/SituationPackage'
 import N_ProductCatagory from './Screens/ProductCatagory'
 import N_ProductDetail from './Screens/ProductDetail'
+import N_History from './Screens/History'
+import N_HistoryDetail from './Screens/HistoryDetail'
 import TabIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const App: () => Node = () => {
@@ -51,6 +53,8 @@ const App: () => Node = () => {
         <AnalyseStack.Screen name="S_StartAnalyse" component={N_StartAnalyse} options={{ headerShown: false }} />
         <AnalyseStack.Screen name="S_Camera" component={N_Camera} options={{ headerShown: false }} />
         <AnalyseStack.Screen name="S_Home" component={N_Home} options={{ headerShown: false }} />
+        <AnalyseStack.Screen name="S_History" component={N_History} options={{ headerShown: false }} />
+        <AnalyseStack.Screen name="S_HistoryDetail" component={N_HistoryDetail} options={{ headerShown: false }} />
       </AnalyseStack.Navigator>
     )
   }//第一個Bottom Tab的堆疊

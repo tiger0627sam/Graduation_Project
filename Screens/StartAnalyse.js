@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { StyleSheet, ScrollView, Text, View, Image, TouchableOpacity } from 'react-native';
+import { LogBox, StyleSheet, ScrollView, Text, View, Image, TouchableOpacity } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import Logo from '../assets/Images/Logo3.png';
 import LogoText from '../assets/Images/Text5.png';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Loading from '../Components/Loading';
 import { authentication } from "../Firebase/firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { signOut } from "firebase/auth";
@@ -23,9 +24,17 @@ const StartAnalyse = ({ navigation, route }) => {
         navigation.navigate('S_Camera')
     }
 
+    function ToHistory() {
+        navigation.navigate('S_History', userid)
+    }
+
     const [selectedImage, setSelectedImage] = useState(null);
     const [test, isTested] = useState(false);
+    const [LoadingMsg, setLoadingMsg] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
     const [userid, setUserid] = useState('');
+
+    LogBox.ignoreLogs(['Setting a timer']);
 
     const LogOut = () => {
         signOut(authentication)
@@ -38,15 +47,22 @@ const StartAnalyse = ({ navigation, route }) => {
 
     useEffect(() => {
         const auth = getAuth();
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                setUserid(user.uid);
-                console.log(userid)
+        const user = auth.currentUser;
+        if (user !== null) {
+            const uid = user.uid;
+            setUserid(uid)
+            console.log(userid)
+            if (isLoading) {
+                setIsLoading(false)
             }
-            else {
+        }
+        else {
+            console.log(28148485)
+            if (isLoading) {
+                setIsLoading(false)
             }
-        })
-    }, [])
+        }
+    }, [isLoading])
 
     const [fontsLoaded] = useFonts({
         'Content': require('../assets/Fonts/台灣圓體-Regular.ttf'),
@@ -120,7 +136,6 @@ const StartAnalyse = ({ navigation, route }) => {
             console.log(err)
         }
     }
-
     const pass_data = async () => {
         const DataBase64 = await FileSystem.readAsStringAsync(selectedImage.localUri, { encoding: FileSystem.EncodingType.Base64 });
         ToHome(DataBase64)
@@ -174,7 +189,7 @@ const StartAnalyse = ({ navigation, route }) => {
                                 選擇照片
                             </Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.SiguInButton} >
+                        <TouchableOpacity style={styles.SiguInButton} onPress={ToHistory}>
                             <Icon name="history" size={26} color='#000' />
                             <Text style={styles.ButtonText}>
                                 歷史紀錄
@@ -188,6 +203,11 @@ const StartAnalyse = ({ navigation, route }) => {
                         </TouchableOpacity>
                     </View>
                 </ScrollView>
+                {isLoading == true ?
+                    <Loading loadingMessage={LoadingMsg} />
+                    :
+                    null
+                }
             </View>
         )
     }
