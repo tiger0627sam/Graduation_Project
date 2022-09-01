@@ -5,7 +5,9 @@ import LogoText from '../assets/Images/Text5.png';
 import LogOutIcon from 'react-native-vector-icons/Feather';
 import { Overlay } from '@rneui/themed';
 import FormSuccess from '../Components/FormSuccess';
-import { authentication } from "../Firebase/firebase";
+import { authentication, firestore_db } from "../Firebase/firebase";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { doc, setDoc, getDoc, collection, addDoc, getDocs, updateDoc, increment } from "firebase/firestore";
 import { signOut } from "firebase/auth";
 import MyStausBar from '../Components/MyStatusBar'
 import { useFonts } from 'expo-font';
@@ -18,6 +20,8 @@ const Home = ({ navigation, route }) => {
     const [dataAnalyzed, setDataAnalyzed] = useState({});
     const [faceAnalyzed, setFaceAnalyzed] = useState('');
     const [RawFace, setRawFace] = useState('');
+    const [userid, setUserid] = useState('');
+    const [couter, setCouter] = useState('1')
 
     const LogOut = () => {
         signOut(authentication)
@@ -26,7 +30,18 @@ const Home = ({ navigation, route }) => {
             .catch((err) => {
                 console.log(err)
             })
-    }
+    }//登出
+
+    useEffect(() => {
+        const auth = getAuth();
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                setUserid(user.uid);
+            }
+            else {
+            }
+        })
+    }, [])
 
     const [fontsLoaded] = useFonts({
         'Content': require('../assets/Fonts/台灣圓體-Regular.ttf'),
@@ -45,7 +60,7 @@ const Home = ({ navigation, route }) => {
         if (fontsLoaded) {
             await SplashScreen.hideAsync();
         }
-    }, [fontsLoaded]);
+    }, [fontsLoaded]);//字幕區
 
     const toggleOverlay = () => {
         setVisible(!visible);
@@ -108,20 +123,57 @@ const Home = ({ navigation, route }) => {
             }
         }
         face_analysis()
-    }, [])
+    }, [])//取得用戶提供的照片後進行分析並拿到分析結果
 
+    const upload_historydata = async () => {
+        try {
+            setIsLoading(true)
+            const docSnap = await getDoc(doc(firestore_db, "Couter", userid));
+            if (docSnap.exists()) {
+                setCouter(docSnap.data().num)
+                console.log(couter);
+            } else {
+                console.log("No such document!");
+            }
+            // console.log(15484858858)
+            // await setDoc(doc(firestore_db, "UserRecord", "History", userid, '' + couter), {
+            //     ...dataAnalyzed,
+            //     pointedImage: faceAnalyzed,
+            //     rawfaceImage: RawFace,
+            //     key: couter,
+            // });
+            // console.log(8148484848485)
+            // await updateDoc(doc(firestore_db, "Couter", userid), {
+            //     num: increment(1)
+            // });
 
+            const querySnapshot = await getDocs(collection(firestore_db, "UserRecord", "History", userid));
+            querySnapshot.forEach((doc) => {
+                // doc.data() is never undefined for query doc snapshots
+                console.log(doc.id, " => ", doc.data());
+            });
+        }
+        catch (err) {
+            console.log(err)
+        }
+        setIsLoading(false)
+    }
+    // await updateDoc(doc(firestore_db, "History", userid), {
+    //     num: increment(1)
+    // });
     return (
         <View style={styles.mainView} onLayout={onLayoutRootView}>
             <MyStausBar />
             <View style={styles.TopView}>
-                <Image source={Logo} style={styles.TopLogo} />
-                <Image source={LogoText} style={styles.TopLogo2} />
-            </View>
-            <View style={styles.LogOut}>
-                <TouchableOpacity onPress={LogOut}>
-                    <LogOutIcon name="log-out" size={35} color='#fff' />
-                </TouchableOpacity>
+                <View style={styles.Brand}>
+                    <Image source={Logo} style={styles.TopLogo} />
+                    <Image source={LogoText} style={styles.TopLogo2} />
+                </View>
+                <View style={styles.LogOut}>
+                    <TouchableOpacity onPress={LogOut}>
+                        <LogOutIcon name="log-out" size={35} color='#fff' />
+                    </TouchableOpacity>
+                </View>
             </View>
             <ScrollView style={styles.ButtomView}>
                 <Text style={styles.Express}>
@@ -138,7 +190,7 @@ const Home = ({ navigation, route }) => {
                     </Text>
                     <View style={styles.OtherPart}>
                         <TouchableOpacity style={styles.PartButton}>
-                            <Text style={styles.ButtonText} onPress={toggleOverlay}>
+                            <Text style={styles.ButtonText} onPress={upload_historydata}>
                                 其他部位
                             </Text>
                         </TouchableOpacity>
@@ -210,13 +262,22 @@ const styles = StyleSheet.create({
     },
     TopView: {
         width: '100%',
-        height: '13%',
+        height: '11%',
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    Brand: {
         display: 'flex',
         flexDirection: 'row',
     },
+    LogOut: {
+        marginTop: 25,
+        marginRight: 10,
+    },
     ButtomView: {
         width: '100%',
-        height: '87%',
+        height: '89%',
         // borderWidth: 2,
         // borderColor: "#000",
         backgroundColor: '#FAF2F2',
@@ -272,10 +333,6 @@ const styles = StyleSheet.create({
         height: 45,
         width: 135,
         borderRadius: 2,
-    },
-    LogOut: {
-        marginTop: 25,
-        marginRight: 10,
     },
     Express: {
         textAlign: 'left',
