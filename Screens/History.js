@@ -8,11 +8,11 @@ import { authentication, firestore_db } from "../Firebase/firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { doc, setDoc, getDoc, collection, addDoc, getDocs, updateDoc, increment, query, orderBy, limit } from "firebase/firestore";
 import { signOut } from "firebase/auth";
-import MyStausBar from '../Components/MyStatusBar'
+import MyStausBar from '../Components/MyStatusBar';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 
-const History = ({ navigation, route }) => {
+const History = ({ navigation }) => {
 
     const [isLoading, setIsLoading] = useState(true);
     const [isTested, setIsTested] = useState(false);
@@ -65,16 +65,12 @@ const History = ({ navigation, route }) => {
         }
     }, [fontsLoaded]);//字體區
 
-
-
     useEffect(() => {
         const Record_Loading = async () => {
             const auth = getAuth();
             const uid = auth.currentUser.uid;
             setUserid(uid)
-            console.log(2959558859)
             console.log(userid)
-            console.log(5958859)
 
             const docCheck = doc(firestore_db, "UserRecord", "History", uid, '' + 1);
             const docSnap = await getDoc(docCheck);
@@ -87,11 +83,10 @@ const History = ({ navigation, route }) => {
                 setRecord(Data_List)
                 console.log(record)
                 setIsTested(true)
-                setIsLoading(false)
             } else {
                 setIsTested(false)
-                setIsLoading(false)
             }
+            setIsLoading(false)
         }
         Record_Loading()
     }, [isLoading])

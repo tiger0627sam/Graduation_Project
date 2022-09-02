@@ -25,14 +25,10 @@ const StartAnalyse = ({ navigation, route }) => {
     }
 
     function ToHistory() {
-        navigation.navigate('S_History', userid)
+        navigation.navigate('S_History')
     }
 
     const [selectedImage, setSelectedImage] = useState(null);
-    const [test, isTested] = useState(false);
-    const [LoadingMsg, setLoadingMsg] = useState('');
-    const [isLoading, setIsLoading] = useState(true);
-    const [userid, setUserid] = useState('');
 
     LogBox.ignoreLogs(['Setting a timer']);
 
@@ -44,25 +40,6 @@ const StartAnalyse = ({ navigation, route }) => {
                 console.log(err)
             })
     }
-
-    useEffect(() => {
-        const auth = getAuth();
-        const user = auth.currentUser;
-        if (user !== null) {
-            const uid = user.uid;
-            setUserid(uid)
-            console.log(userid)
-            if (isLoading) {
-                setIsLoading(false)
-            }
-        }
-        else {
-            console.log(28148485)
-            if (isLoading) {
-                setIsLoading(false)
-            }
-        }
-    }, [isLoading])
 
     const [fontsLoaded] = useFonts({
         'Content': require('../assets/Fonts/台灣圓體-Regular.ttf'),
@@ -102,45 +79,16 @@ const StartAnalyse = ({ navigation, route }) => {
         setSelectedImage({ localUri: pickerResult.uri });
     }//選照片的function
 
-    const FormData = require("form-data")
-
-    //讀取圖片成base64 string
-    const face_analysis = async () => {
-
-        try {
-            const DataBase64 = await FileSystem.readAsStringAsync(selectedImage.localUri, { encoding: FileSystem.EncodingType.Base64 });
-            const bodyFormData = new FormData();
-            //把資料放進form data
-            bodyFormData.append('data', DataBase64)
-
-            await fetch("https://graduate-project-api.herokuapp.com/face_analysis", {
-                // https://graduate-project-api.herokuapp.com/face_analysis
-                method: "POST",
-                body: bodyFormData
-            })
-                .then(res => res.json())
-                .then(data => { console.log(data) })
-
-            await fetch("https://get-face-analysis-image.herokuapp.com/get", {
-                method: "POST",
-                body: bodyFormData
-            })
-                .then(res => res.text())
-                .then(data => {
-                    console.log(data)
-                    setSelectedImage({ localUri: data });
-                })
-        }
-
-        catch (err) {
-            console.log(err)
-        }
-    }
     const pass_data = async () => {
         const DataBase64 = await FileSystem.readAsStringAsync(selectedImage.localUri, { encoding: FileSystem.EncodingType.Base64 });
         ToHome(DataBase64)
         // console.log(DataBase64)
     }
+
+    const BackStart = () => {
+        setSelectedImage(null);
+    }
+
 
     if (selectedImage !== null) {
         return (
@@ -160,6 +108,12 @@ const StartAnalyse = ({ navigation, route }) => {
                     <Icon name="photo" size={26} color='#000' />
                     <Text style={styles.ButtonText}>
                         重新選取
+                    </Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.LogOutButton} onPress={BackStart}>
+                    <LogOutIcon name="log-out" size={16} color='gray' />
+                    <Text style={styles.LogOutText}>
+                        回首頁
                     </Text>
                 </TouchableOpacity>
             </View>
@@ -203,11 +157,6 @@ const StartAnalyse = ({ navigation, route }) => {
                         </TouchableOpacity>
                     </View>
                 </ScrollView>
-                {isLoading == true ?
-                    <Loading loadingMessage={LoadingMsg} />
-                    :
-                    null
-                }
             </View>
         )
     }

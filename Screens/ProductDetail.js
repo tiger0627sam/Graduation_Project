@@ -45,10 +45,10 @@ const ProductDetail = ({ navigation, route }) => {
         const get_cosmetics = async () => {
             try {
                 console.log(cat)
-                const result = await axios.get("https://graduate-project-api.herokuapp.com/get-" + cat)
-                // console.log(result.data)
-                setData_array(result.data)
                 if (isLoading) {
+                    const result = await axios.get("https://graduate-project-api.herokuapp.com/get-" + cat)
+                    setData_array(result.data)
+                    console.log(result.data)
                     setIsLoading(false)
                 }
             }

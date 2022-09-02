@@ -4,19 +4,17 @@ import Logo from '../assets/Images/Logo3.png'
 import LogoText from '../assets/Images/Text5.png';
 import LogOutIcon from 'react-native-vector-icons/Feather';
 import { Overlay } from '@rneui/themed';
-import FormSuccess from '../Components/FormSuccess';
 import Loading from '../Components/Loading';
 import { authentication, firestore_db } from "../Firebase/firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { doc, setDoc, getDoc, collection, addDoc, getDocs, updateDoc, increment } from "firebase/firestore";
 import { signOut } from "firebase/auth";
-import MyStausBar from '../Components/MyStatusBar'
+import MyStausBar from '../Components/MyStatusBar';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 
 const Home = ({ navigation, route }) => {
 
-    const [visible, setVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [LoadingMsg, setLoadingMsg] = useState('');
     const [dataAnalyzed, setDataAnalyzed] = useState({});
@@ -55,25 +53,6 @@ const Home = ({ navigation, route }) => {
         }
     }, [fontsLoaded]);//字幕區
 
-    const toggleOverlay = () => {
-        setVisible(!visible);
-    };
-
-    const Part_of_Face = [
-        { text: '眼睛', key: '1' },
-        { text: '嘴', key: '2' },
-        { text: '眉毛', key: '3' },
-        { text: '鼻子', key: '4' },
-        { text: '臉型', key: '5' },
-        { text: '下顎', key: '6' },
-    ];
-
-    const Item = ({ title, onPress }) => (
-        <TouchableOpacity onPress={onPress} style={styles.PartButton}>
-            <Text style={styles.Text}>{title}</Text>
-        </TouchableOpacity>
-    );
-
     const FormData = require("form-data")
 
     useEffect(() => {
@@ -83,31 +62,32 @@ const Home = ({ navigation, route }) => {
         const bodyFormData = new FormData();
         //把資料放進form data
         bodyFormData.append('data', test_result)
+
         const face_analysis = async () => {
             try {
-                await fetch("https://graduate-project-api.herokuapp.com/get-faceRecommend", {
-                    // https://graduate-project-api.herokuapp.com/face_analysis
-                    method: "POST",
-                    body: bodyFormData
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        console.log(data)
-                        setDataAnalyzed(data)
-                        setLoadingMsg('特徵分析中')
-                    })
-
-                await fetch("https://get-face-analysis-image.herokuapp.com/get", {
-                    method: "POST",
-                    body: bodyFormData
-                })
-                    .then(res => res.text())
-                    .then(data => {
-                        console.log(data)
-                        setFaceAnalyzed(data)
-                        // setSelectedImage({ localUri: data });
-                    })
                 if (isLoading) {
+                    await fetch("https://graduate-project-api.herokuapp.com/get-faceRecommend", {
+                        // https://graduate-project-api.herokuapp.com/face_analysis
+                        method: "POST",
+                        body: bodyFormData
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            // console.log(data)
+                            setDataAnalyzed(data)
+                            setLoadingMsg('特徵分析中')
+                        })
+
+                    await fetch("https://get-face-analysis-image.herokuapp.com/get", {
+                        method: "POST",
+                        body: bodyFormData
+                    })
+                        .then(res => res.text())
+                        .then(data => {
+                            // console.log(data)
+                            setFaceAnalyzed(data)
+                            // setSelectedImage({ localUri: data });
+                        })
                     setIsLoading(false)
                 }
             }
@@ -176,76 +156,64 @@ const Home = ({ navigation, route }) => {
                     </TouchableOpacity>
                 </View>
             </View>
-            <ScrollView style={styles.ButtomView}>
-                <Text style={styles.Express}>
-                    臉型分析
-                </Text>
-                <View style={styles.TopResult}>
-                    <Image source={{ uri: RawFace }} style={styles.TopPhoto} />
-                    <Image source={{ uri: faceAnalyzed }} style={styles.TopPhoto} />
-                </View>
-                {/* 上面放原本的照片跟分析完的點點 */}
-                <View style={{ flexDirection: 'row' }}>
-                    <Text style={styles.Express}>
-                        臉型說明
-                    </Text>
-                    <View style={styles.OtherPart}>
-                        <TouchableOpacity style={styles.PartButton}>
-                            <Text style={styles.ButtonText} onPress={upload_historydata}>
-                                其他部位
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
-                    <Overlay overlayStyle={styles.Overlay} isVisible={visible} onBackdropPress={toggleOverlay}>
-                        <View style={styles.Center}>
-                            <FlatList
-                                numColumns={2}
-                                columnWrapperStyle={{ justifyContent: 'space-around' }}
-                                data={Part_of_Face}
-                                renderItem={({ item }) => (
-                                    <Item title={item.text} />
-                                    // onPress回傳參數然後用一個頁面顯示其他部位的測試結果
-                                )}
-                            />
-                        </View>
-                    </Overlay>
-                </View>
-                <View style={styles.Makeup}>
-                    <View style={{ flex: 1 }}>
-                        <Image source={{ uri: dataAnalyzed.face_example_image }} style={styles.ButtomPhoto} />
-                    </View>
-                    <View style={{ flex: 2 }}>
-                        <Text style={styles.Detail}>
-                            經分析後您的臉型為<Text style={styles.MarkedText}>{dataAnalyzed.name}</Text>
-                            {'\n'}
-                            {dataAnalyzed.face_description}
-                            {'\n'}
-                            {'\n'}
-                            與您臉型相同的明星：<Text style={styles.MarkedText}>{dataAnalyzed.face_example}</Text>
-                        </Text>
-                    </View>
-                </View>
-                <Text style={styles.Express}>
-                    推薦眉型
-                </Text>
-                <View style={styles.Makeup}>
-                    <View style={{ flex: 1 }}>
-                        <Image source={{ uri: dataAnalyzed.eyebrow_example_image }} style={styles.ButtomPhoto} />
-                    </View>
-                    <View style={{ flex: 2 }}>
-                        <Text style={styles.Detail}>
-                            推薦眉型為<Text style={styles.MarkedText}>{dataAnalyzed.eyebrow_type}</Text>
-                            {'\n'}
-                            {'\n'}
-                            {dataAnalyzed.eyebrow_recommend}
-                        </Text>
-                    </View>
-                </View>
-            </ScrollView>
             {isLoading == true ?
-                <Loading loadingMessage={LoadingMsg} />
+                <ScrollView style={styles.ButtomView}>
+                    <Loading loadingMessage={LoadingMsg} />
+                </ScrollView>//還在跑API的時候讓他轉圈圈
                 :
-                null
+                <ScrollView style={styles.ButtomView}>
+                    <Text style={styles.Express}>
+                        臉型分析
+                    </Text>
+                    <View style={styles.TopResult}>
+                        <Image source={{ uri: RawFace }} style={styles.TopPhoto} />
+                        <Image source={{ uri: faceAnalyzed }} style={styles.TopPhoto} />
+                    </View>
+                    {/* 上面放原本的照片跟分析完的點點 */}
+                    <View style={{ flexDirection: 'row' }}>
+                        <Text style={styles.Express}>
+                            臉型說明
+                        </Text>
+                        <View style={styles.OtherPart}>
+                            <TouchableOpacity style={styles.PartButton}>
+                                <Text style={styles.ButtonText} onPress={upload_historydata}>
+                                    儲存結果
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                    <View style={styles.Makeup}>
+                        <View style={{ flex: 1 }}>
+                            <Image source={{ uri: dataAnalyzed.face_example_image }} style={styles.ButtomPhoto} />
+                        </View>
+                        <View style={{ flex: 2 }}>
+                            <Text style={styles.Detail}>
+                                經分析後您的臉型為<Text style={styles.MarkedText}>{dataAnalyzed.name}</Text>
+                                {'\n'}
+                                {dataAnalyzed.face_description}
+                                {'\n'}
+                                {'\n'}
+                                與您臉型相同的明星：<Text style={styles.MarkedText}>{dataAnalyzed.face_example}</Text>
+                            </Text>
+                        </View>
+                    </View>
+                    <Text style={styles.Express}>
+                        推薦眉型
+                    </Text>
+                    <View style={styles.Makeup}>
+                        <View style={{ flex: 1 }}>
+                            <Image source={{ uri: dataAnalyzed.eyebrow_example_image }} style={styles.ButtomPhoto} />
+                        </View>
+                        <View style={{ flex: 2 }}>
+                            <Text style={styles.Detail}>
+                                推薦眉型為<Text style={styles.MarkedText}>{dataAnalyzed.eyebrow_type}</Text>
+                                {'\n'}
+                                {'\n'}
+                                {dataAnalyzed.eyebrow_recommend}
+                            </Text>
+                        </View>
+                    </View>
+                </ScrollView>//跑完以後render的畫面
             }
         </View>
     )

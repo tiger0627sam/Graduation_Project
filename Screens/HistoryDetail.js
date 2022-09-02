@@ -69,7 +69,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#D58795'
-
     },
     TopView: {
         width: '100%',
