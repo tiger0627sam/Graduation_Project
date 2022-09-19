@@ -19,9 +19,10 @@ const Home = ({ navigation, route }) => {
     const [LoadingMsg, setLoadingMsg] = useState('');
     const [dataAnalyzed, setDataAnalyzed] = useState({});
     const [faceAnalyzed, setFaceAnalyzed] = useState('');
+    const [eyeAnalyzed, setEyeAnalyzed] = useState({});
     const [RawFace, setRawFace] = useState('');
     const [userid, setUserid] = useState('');
-    const [couter, setCouter] = useState(3)
+    const [couter, setCouter] = useState(1)
 
     LogBox.ignoreLogs(['Setting a timer']);
 
@@ -56,7 +57,7 @@ const Home = ({ navigation, route }) => {
     const FormData = require("form-data")
 
     useEffect(() => {
-        setLoadingMsg('臉型分析中')
+        setLoadingMsg('臉部辨識中')
         const test_result = route.params
         setRawFace('data:image/png;base64,' + route.params)
         const bodyFormData = new FormData();
@@ -73,9 +74,9 @@ const Home = ({ navigation, route }) => {
                     })
                         .then(res => res.json())
                         .then(data => {
-                            // console.log(data)
+                            console.log(data)
                             setDataAnalyzed(data)
-                            setLoadingMsg('特徵分析中')
+                            setLoadingMsg('臉型分析中')
                         })
 
                     await fetch("https://get-face-analysis-image.herokuapp.com/get", {
@@ -84,9 +85,18 @@ const Home = ({ navigation, route }) => {
                     })
                         .then(res => res.text())
                         .then(data => {
-                            // console.log(data)
                             setFaceAnalyzed(data)
-                            // setSelectedImage({ localUri: data });
+                            setLoadingMsg('特徵分析中')
+                        })
+
+                    await fetch("https://graduate-project-api.herokuapp.com/get-eyesRecommend", {
+                        method: "POST",
+                        body: bodyFormData
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            setEyeAnalyzed(data)
+                            // console.log(data)
                         })
                     setIsLoading(false)
                 }
@@ -128,8 +138,9 @@ const Home = ({ navigation, route }) => {
             await setDoc(doc(firestore_db, "UserRecord", "History", userid, couter + ''), {
                 ...dataAnalyzed,
                 pointedImage: faceAnalyzed,
-                rawfaceImage: RawFace,
+                // rawfaceImage: RawFace,
                 key: couter,
+                eye_type: eyeAnalyzed.name,
             });
 
             await updateDoc(doc(firestore_db, "Couter", userid + ''), {
@@ -192,7 +203,6 @@ const Home = ({ navigation, route }) => {
                                 {'\n'}
                                 {dataAnalyzed.face_description}
                                 {'\n'}
-                                {'\n'}
                                 與您臉型相同的明星：<Text style={styles.MarkedText}>{dataAnalyzed.face_example}</Text>
                             </Text>
                         </View>
@@ -208,10 +218,34 @@ const Home = ({ navigation, route }) => {
                             <Text style={styles.Detail}>
                                 推薦眉型為<Text style={styles.MarkedText}>{dataAnalyzed.eyebrow_type}</Text>
                                 {'\n'}
-                                {'\n'}
                                 {dataAnalyzed.eyebrow_recommend}
                             </Text>
                         </View>
+                    </View>
+                    <Text style={styles.Express}>
+                        眼型分析
+                    </Text>
+                    <View style={styles.Makeup}>
+                        <View style={{ flex: 1 }}>
+                            <Image source={{ uri: eyeAnalyzed.eyes_example_image }} style={styles.ButtomPhoto} />
+                        </View>
+                        <View style={{ flex: 2 }}>
+                            <Text style={styles.Detail}>
+                                您的眼型為<Text style={styles.MarkedText}>{eyeAnalyzed.name}</Text>
+                                {'\n'}
+                                細部分析：{eyeAnalyzed.eyes_description}
+                                {'\n'}
+                                {eyeAnalyzed.eyes_analyze}
+                            </Text>
+                        </View>
+                    </View>
+                    <Text style={styles.Express}>
+                        眼妝建議
+                    </Text>
+                    <View style={styles.Makeup}>
+                        <Text style={styles.Detail}>
+                            {eyeAnalyzed.makeup_recommendation}
+                        </Text>
                     </View>
                 </ScrollView>//跑完以後render的畫面
             }
@@ -269,7 +303,7 @@ const styles = StyleSheet.create({
         marginRight: 15,
         fontSize: 15,
         fontFamily: 'Content',
-        lineHeight: 20,
+        lineHeight: 30,
     },
     MarkedText: {
         fontSize: 18,

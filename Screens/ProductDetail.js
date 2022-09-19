@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
     },
     Product_text: {
         flex: 1,
-        justifyContent: 'flex-end',
+        justifyContent: 'center',
     },
     ItemText: {
         textAlign: 'left',

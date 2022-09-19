@@ -30,7 +30,7 @@ const History = ({ navigation }) => {
             <View style={styles.Product_text}>
                 <Text style={styles.ItemText}> 臉型：{face} </Text>
                 <Text style={styles.ItemText}> 推薦眉型：{eyebrow} </Text>
-                <Text style={styles.ItemText}> 參考明星：{eyes} </Text>
+                <Text style={styles.ItemText}> 眼型：{eyes} </Text>
                 {/* <Text style={styles.ItemText}> 時間 </Text> */}
             </View>
         </View>
@@ -126,7 +126,7 @@ const History = ({ navigation }) => {
                                     face={item.name}
                                     eyebrow={item.eyebrow_type}
                                     picture={item.pointedImage}
-                                    eyes={item.face_example}
+                                    eyes={item.eye_type}
                                 />
                             )}
                         />
