@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "my-new-project",
-    "slug": "my-new-project",
-    "version": "1.0.0",
+    "name": "Carmine Crane",
+    "slug": "carminecrane",
+    "version": "2.2.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/Images/Logo3.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#D58795"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -21,12 +21,18 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
-      }
+        "foregroundImage": "./assets/Images/Logo3.png",
+        "backgroundColor": "#D58795"
+      },
+      "package": "com.carminecrane"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "4851bab3-10bf-4c9d-a86e-770293607d27"
+      }
     }
   }
 }

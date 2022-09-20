@@ -74,7 +74,7 @@ const Home = ({ navigation, route }) => {
                     })
                         .then(res => res.json())
                         .then(data => {
-                            console.log(data)
+                            // console.log(data)
                             setDataAnalyzed(data)
                             setLoadingMsg('臉型分析中')
                         })
